@@ -1,0 +1,82 @@
+# docker-compose.yml
+name: convertX
+
+
+services:
+  convertx:
+    image: ghcr.io/c4illin/convertx:v0.14.1
+    container_name: convertx
+    restart: unless-stopped # No, always, on-failure:N, unless-stopped
+#    ports:
+#      - 8080:8080
+    expose:
+      - 3000
+    user: 0:0 # "$PUID:$PGID"
+    environment:
+      - PUID=0
+      - PGID=0
+      - JWT_SECRET=$default_password
+      - ACOUNTS_REGISTRATION=false
+      - HTTP_ALLOWED=true
+      - ALLOW_UNAUTHENTICATED=false
+      - AUTO_DELETE_EVERY_N_HOURS=24
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+    volumes:
+    - /DATA/AppData/$AppID/data:/app/data
+    - /DATA/Downlods:/downloads:ro
+    - /DATA/Documents:/documents:ro
+
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--tries=1", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+x-casaos:
+  architectures:
+    - amd64
+    - arm64
+  main: convertX
+  pre-installed-cmd: |
+    # mkdir -p /DATA/AppData/$AppID/data &&
+    # chmod -R 777 /DATA/AppData/$AppId/data
+  author: lee
+  category: Utilities
+  developer: this1212
+  icon: https://github.com/this-Lee/YunderaClass@main/Apps/convertX/icon.png
+  screenshot_link: 
+    - https://github.com/this-Lee/YunderaClass@main/Apps/convertX/screenshot-1.png
+    - https://github.com/this-Lee/YunderaClass@main/Apps/convertX/screenshot-2.png
+    - https://github.com/this-Lee/YunderaClass@main/Apps/convertX/screenshot-3.png
+
+  title:
+    en_us: title_convertX
+    ko_kr: title_ConvertX
+    zh_cn: title_ConvertX
+    fr_fr: title_ConvertX
+    es_es: title_ConvertX
+  tagline:
+    en_us: tagline_Convert your files to any format you want
+    ko_kr: tagline_원하는 형식으로 파일을 변환합니다
+    zh_cn: tagline_将文件转换为任何您想要的格式
+    fr_fr: tagline_Convertissez vos fichiers en n'importe quel format que vous voulez
+    es_es: tagline_Convierte tus archivos a cualquier formato que quieras
+  description:
+    en_us: description_convert your files to any format you want
+    ko_kr: description_원하는 형식으로 파일을 변환합니다
+    zh_cn: description_将文件转换为任何您想要的格式
+    fr_fr: description_Convertissez vos fichiers en n'importe quel format que vous voulez
+    es_es: description_Convierte tus archivos a cualquier formato que quieras
+  index: /
+  webui_port: 3000
+  
+# ro : 읽기 전용, rw : 읽기/쓰기, 기본값 rw
+
+#volumes: 호스트의 디렉토리와 컨테이너의 디렉토리를 연결
+# ./data : 호스트의 디렉토리 경로
+# /app/data : 컨테이너 내부의 디렉토리 경로
